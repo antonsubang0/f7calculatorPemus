@@ -1,0 +1,13 @@
+{
+  "appId": "ion.anton.calpes",
+  "appName": "CalPes",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}

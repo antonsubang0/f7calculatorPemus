@@ -1,0 +1,25 @@
+{
+  "cwd": "/media/anton/Data/npm/hybrid/calculator",
+  "type": [
+    "capacitor"
+  ],
+  "name": "CalPes",
+  "framework": "react",
+  "template": "single-view",
+  "bundler": "vite",
+  "cssPreProcessor": "less",
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": false,
+    "iconFonts": true,
+    "fillBars": false
+  },
+  "customBuild": false,
+  "pkg": "ion.anton.calpes",
+  "capacitor": {
+    "platforms": [
+      "android"
+    ]
+  }
+}

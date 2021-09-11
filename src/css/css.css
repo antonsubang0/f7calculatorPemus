@@ -1,0 +1,60 @@
+@font-face {
+    font-family: 'MyWebFont';
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+}
+* {
+    font-family: 'MywebFont';
+}
+.navbar-bg {
+    background-color: var(--f7-theme-color-bg-color);
+}
+div.title.color-white {
+    color: var(--swiper-theme-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+div {
+    font-size: 0.9rem;
+}
+.quotacss {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 2rem;
+}
+.btnNum {
+    margin-bottom: 10px;
+}
+.ValueNumPadcss {
+    padding-left: 50px;
+    font-weight: 700;
+}
+.kananNavbar {
+    position: absolute;
+    right: 20px;
+    color: whitesmoke;
+    font-size: 15px;
+}
+.cardCs {
+    margin: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 3px 5px 5px #dedede;
+}
+.rowCs {
+    margin-bottom: 20px;
+}
+.mcs{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.btcs {
+    border-top: 3px solid #eee;
+    padding-top: 15px;
+}
+.fwcs {
+    font-weight: bold;
+}
+.uncs {
+    text-decoration: underline;
+}
