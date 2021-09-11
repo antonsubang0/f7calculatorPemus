@@ -210,7 +210,7 @@ const HomePage = () => {
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{kekurangan.toFixed(4)} ( { (kekurangan*100).toFixed(2) } %)</div>
+          <div>{valueX.infertile + valueX.explode + valueX.dis + valueX.kurang} ( { (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
