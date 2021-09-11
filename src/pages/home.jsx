@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { App } from '@capacitor/app';
+import { Device } from '@capacitor/device';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   Page,
   Navbar,
@@ -109,12 +111,8 @@ const HomePage = () => {
   useEffect(()=>{
     setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
     setJumlahSample(valueX.rakSampling * valueX.perRak);
-    if ((valueX.rakSampling * valueX.perRak)!==0) {
-      setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak));
-    }
-    if (((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir)!==0) {
-      setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir)); 
-    }
+    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak));
+    setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
   },[valueX, setJumlahSample]);
   useEffect(()=>{
     App.removeAllListeners();
@@ -129,6 +127,14 @@ const HomePage = () => {
       }
     })
   },[sheetOpened]);
+  useEffect(()=>{
+    Device.getInfo().then((res) => {
+      if (res.platform == 'android') {
+        StatusBar.setStyle({ style: Style.Dark });
+        StatusBar.setBackgroundColor({color : '#009688'}); 
+      }
+    });
+  },[])
 
   return (
   <Page name="home">
@@ -210,13 +216,13 @@ const HomePage = () => {
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{valueX.infertile + valueX.explode + valueX.dis + valueX.kurang} ( { (kekurangan*100).toFixed(2) } %)</div>
+          <div>{valueX.infertile + valueX.explode + valueX.dis + valueX.kurang} ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss'>
-        <Col className='text-align-center'>Penggantian : {penggantian} Btr ( { valueX.perRak !== 0 ? Math.floor(penggantian/valueX.perRak) : 0} rak, {valueX.perRak !==0 ? penggantian - (Math.floor(penggantian/valueX.perRak)*valueX.perRak) : 0 } btr )</Col>
+        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
       </Row>
     </div>
     
