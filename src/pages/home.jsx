@@ -32,16 +32,20 @@ const HomePage = () => {
     dis : 0,
     kurang : 0,
   });
+  const [osVs, setOsVs] = useState(0);
   const [quota, setQuota] = useState(0);
   const [jumlahSample, setJumlahSample] = useState(0);
   const [kekurangan, setKekurangan] = useState(0);
   const [penggantian, setPenggantian] = useState(0);
-  const handleObject = (data) => {
+  const handleObject = (data, value) => {
     setSheetOpened(true);
-    setValueNumPad(0);
+    setValueNumPad(value);
     setFill(data);
   }
   const handleNumPad = (data) => {
+    if (parseInt(valueNumPad + data) > 10000) {
+      return;
+    }
     setValueNumPad(parseInt(valueNumPad + data));
     if (fill== 1) {
       setValueX({...valueX, perKereta : parseInt(valueNumPad + data)});      
@@ -130,8 +134,11 @@ const HomePage = () => {
   useEffect(()=>{
     Device.getInfo().then((res) => {
       if (res.platform == 'android') {
-        StatusBar.setStyle({ style: Style.Dark });
-        StatusBar.setBackgroundColor({color : '#009688'}); 
+        if (res.osVersion > 5.5) {
+          StatusBar.setStyle({ style: Style.Dark });
+          StatusBar.setBackgroundColor({color : '#009688'});  
+        }
+        setOsVs(res.osVersion);
       }
     });
   },[])
@@ -141,7 +148,7 @@ const HomePage = () => {
     {/* Top Navbar */}
     <Navbar bgColor='teal' sliding={false}>
       <NavTitle color='white'>CalPes</NavTitle>
-      <div className='kananNavbar'>@cahMagetan</div>
+      <div className='kananNavbar'>@cahMagetan {osVs}</div>
     </Navbar>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
@@ -149,27 +156,29 @@ const HomePage = () => {
       </Row>
     
       <Row className='rowCs mcs'>
-      <Col className='text-align-center' onClick={()=>{ handleObject(1);}}>
-          <div> <span className='fwcs'>Per Kereta :</span> { valueX.perKereta } Rak</div>
+      <Col className='text-align-center' onClick={()=>{ handleObject(1, valueX.perKereta);}}>
+          <div className='fwcs'>Per Kereta :</div>
+          <div className='boxCs'> { valueX.perKereta } Rak</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(2);}}>
-          <div> <span className='fwcs'>Per Rak :</span> { valueX.perRak } Butir</div>
+        <Col className='text-align-center' onClick={()=>{ handleObject(2, valueX.perRak);}}>
+          <div className='fwcs'>Per Rak :</div>
+          <div className='boxCs'> { valueX.perRak } Butir</div>
         </Col>
       </Row>
     
     
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(3);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(3, valueX.jumlahKereta);}}>
           <div className='fwcs'>Kereta</div>
-          <div>{ valueX.jumlahKereta }</div>
+          <div className='boxCs'>{ valueX.jumlahKereta }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(4);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(4, valueX.jumlahRak);}}>
           <div className='fwcs'>Rak</div>
-          <div>{ valueX.jumlahRak }</div>
+          <div className='boxCs'>{ valueX.jumlahRak }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(5);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(5, valueX.jumlahButir);}}>
           <div className='fwcs'>Butir</div>
-          <div>{ valueX.jumlahButir }</div>
+          <div className='boxCs'>{ valueX.jumlahButir }</div>
         </Col>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Jumlah</div>
@@ -184,9 +193,9 @@ const HomePage = () => {
     
     
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(6);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(6, valueX.rakSampling);}}>
           <div className='fwcs'>Rak</div>
-          <div>{valueX.rakSampling}</div>
+          <div className='boxCs'>{valueX.rakSampling}</div>
         </Col>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>&#x2211; Sample</div>
@@ -196,21 +205,21 @@ const HomePage = () => {
     
     
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(7);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(7, valueX.infertile);}}>
           <div className='fwcs'>Infertile</div>
-          <div>{ valueX.infertile }</div>
+          <div className='boxCs'>{ valueX.infertile }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(8);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(8, valueX.explode);}}>
           <div className='fwcs'>Explode</div>
-          <div>{ valueX.explode }</div>
+          <div className='boxCs'>{ valueX.explode }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(9);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(9, valueX.dis);}}>
           <div className='fwcs'>DIS</div>
-          <div>{ valueX.dis }</div>
+          <div className='boxCs'>{ valueX.dis }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(10);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(10, valueX.kurang);}}>
           <div className='fwcs'>Kurang</div>
-          <div>{ valueX.kurang }</div>
+          <div className='boxCs'>{ valueX.kurang }</div>
         </Col>
       </Row>
       <Row className='rowCs mcs btcs'>
