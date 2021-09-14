@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { App } from '@capacitor/app';
 import { Device } from '@capacitor/device';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -7,14 +7,13 @@ import {
   Navbar,
   NavTitle,
   PageContent,
-  Sheet,
-  Link,
-  Toolbar,
+  Sheet, Toolbar,
   Row,
   Col,
   Button,
   Icon,
 } from 'framework7-react';
+import CalculatorsW from '../components/calculator';
 
 const HomePage = () => {
   const [sheetOpened, setSheetOpened] = useState(false);
@@ -32,7 +31,7 @@ const HomePage = () => {
     dis : 0,
     kurang : 0,
   });
-  const [osVs, setOsVs] = useState(0);
+  const [osVs, setOsVs] = useState(1);
   const [quota, setQuota] = useState(0);
   const [jumlahSample, setJumlahSample] = useState(0);
   const [kekurangan, setKekurangan] = useState(0);
@@ -119,19 +118,6 @@ const HomePage = () => {
     setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
   },[valueX, setJumlahSample]);
   useEffect(()=>{
-    App.removeAllListeners();
-    App.addListener('backButton', (e)=> {
-      const { canGoBack } = e;
-      if (canGoBack == false) {
-        if (sheetOpened) {
-          setSheetOpened(false)
-        } else {
-          App.exitApp()
-        }
-      }
-    })
-  },[sheetOpened]);
-  useEffect(()=>{
     Device.getInfo().then((res) => {
       if (res.platform == 'android') {
         if (res.osVersion > 5.5) {
@@ -141,14 +127,59 @@ const HomePage = () => {
         setOsVs(res.osVersion);
       }
     });
-  },[])
+  },[]);
+  // caculator
+  const [calculator, setCalculator] = useState(false);
+  const openCalculator = () => {
+    setCalculator(!calculator);
+    if (calculator) {
+      const aa = document.querySelector('.display');
+      const bb = document.querySelector('.contentz');
+      bb.style.bottom = 0 + 'px'; 
+      console.log(bb.clientHeight);
+      let now = 0;
+      let selisih = 0;
+      let position = 0;
+      aa.addEventListener('touchmove', (e) =>{
+        if (now==0) {
+          now = e.changedTouches[0].clientY; 
+        } else {
+          selisih = e.changedTouches[0].clientY - now;
+          if ( selisih > 0) {
+            position = position - selisih/50;
+            if (position < 0 ) {
+              if (position > -240) {
+                bb.style.bottom = position + 'px';  
+              } 
+            }
+          }
+        }
+      });
+    }
+  };
+  const closeCalculation = () => { setCalculator(false)};
+  useEffect(()=>{
+    App.removeAllListeners();
+    App.addListener('backButton', (e)=> {
+      const { canGoBack } = e;
+      if (canGoBack == false) {
+        if (sheetOpened) {
+          setSheetOpened(false);
+        } else if (calculator) {
+          setCalculator(false);
+        } else {
+          App.exitApp()
+        }
+      }
+    })
+  },[sheetOpened, calculator]);
 
   return (
   <Page name="home">
     {/* Top Navbar */}
     <Navbar bgColor='teal' sliding={false}>
       <NavTitle color='white'>CalPes</NavTitle>
-      <div className='kananNavbar'>@cahMagetan {osVs}</div>
+      <div className='kananNavbar' onClick={openCalculator}>@cahMagetan {osVs}</div>
     </Navbar>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
@@ -230,8 +261,13 @@ const HomePage = () => {
       </Row>
     </div>
     <div className='cardCs'>
-      <Row bgColor='teal' className='quotacss'>
+      <Row bgColor='teal' className='quotacss rowCs'>
         <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
+      </Row>
+      <Row className='rowCs mcs'>
+        <Col className='text-align-center'>
+          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || jumlahSample == 0? '0' : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
+        </Col>
       </Row>
     </div>
     
@@ -244,38 +280,36 @@ const HomePage = () => {
       closeByBackdropClick={false}
     >
       <Toolbar>
-        <div className="left ValueNumPadcss"> { valueNumPad == '0' ? '0' : valueNumPad } </div>
-        <div className="right">
-          <Link sheetClose>Close</Link>
+        <div className="left ValueNumPadcss">
+          { valueNumPad == '0' ? '0' : valueNumPad }
         </div>
       </Toolbar>
       {/*  Scrollable sheet content */}
-      <PageContent>
+      <PageContent className='modalBodyNumpad'>
         
           <Row className='btnNum'>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('1')}}><Button fill bgColor='teal'>1</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('2')}}><Button fill bgColor='teal'>2</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('3')}}><Button fill bgColor='teal'>3</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('1')}}><Button className='pyNumPad' fill bgColor='teal'>1</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('2')}}><Button className='pyNumPad' fill bgColor='teal'>2</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('3')}}><Button className='pyNumPad' fill bgColor='teal'>3</Button></Col>
           </Row>
           <Row className='btnNum'>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('4')}}><Button fill bgColor='teal'>4</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('5')}}><Button fill bgColor='teal'>5</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('6')}}><Button fill bgColor='teal'>6</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('4')}}><Button className='pyNumPad' fill bgColor='teal'>4</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('5')}}><Button className='pyNumPad' fill bgColor='teal'>5</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('6')}}><Button className='pyNumPad' fill bgColor='teal'>6</Button></Col>
           </Row>
           <Row className='btnNum'>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('7')}}><Button fill bgColor='teal'>7</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('8')}}><Button fill bgColor='teal'>8</Button></Col>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('9')}}><Button fill bgColor='teal'>9</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('7')}}><Button className='pyNumPad' fill bgColor='teal'>7</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('8')}}><Button className='pyNumPad' fill bgColor='teal'>8</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('9')}}><Button className='pyNumPad' fill bgColor='teal'>9</Button></Col>
           </Row>
           <Row className='btnNum'>
-            <Col className='text-align-center' onClick={()=>{ handleNumPad('0')}}><Button fill bgColor='teal'>0</Button></Col>
-            <Col className='text-align-center' onClick={clearCs}><Button fill bgColor='teal'><Icon material="backspace"></Icon></Button></Col>
-            <Col className='text-align-center' onClick={()=>{ setSheetOpened(false)} } ><Button fill bgColor='teal'><Icon material="check"></Icon></Button></Col>
-          </Row>
-        
+            <Col className='text-align-center' onClick={clearCs}><Button className='pyNumPad' fill bgColor='teal'><Icon material="backspace"></Icon></Button></Col>
+            <Col className='text-align-center' onClick={()=>{ handleNumPad('0')}}><Button className='pyNumPad' fill bgColor='teal'>0</Button></Col>
+            <Col className='text-align-center' onClick={()=>{ setSheetOpened(false)} } ><Button className='pyNumPad' fill bgColor='teal'><Icon material="check"></Icon></Button></Col>
+          </Row> 
       </PageContent>
     </Sheet>
+    <CalculatorsW calculator={calculator} closeCalculation={closeCalculation} />
   </Page>
-
 )};
 export default HomePage;
