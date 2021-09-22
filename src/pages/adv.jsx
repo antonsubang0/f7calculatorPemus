@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { App } from '@capacitor/app';
 import { Device } from '@capacitor/device';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -15,7 +15,7 @@ import {
 } from 'framework7-react';
 import CalculatorsW from '../components/calculator';
 
-const HomePage = ({f7router}) => {
+const Adv = ({f7router}) => {
   const [sheetOpened, setSheetOpened] = useState(false);
   const [fill, setFill] = useState(0);
   const [valueNumPad, setValueNumPad] = useState(0);
@@ -36,9 +36,9 @@ const HomePage = ({f7router}) => {
   const [jumlahSample, setJumlahSample] = useState(0);
   const [kekurangan, setKekurangan] = useState(0);
   const [penggantian, setPenggantian] = useState(0);
-  const handleObject = (data, value) => {
+  const handleObject = (data) => {
     setSheetOpened(true);
-    setValueNumPad(value);
+    setValueNumPad(0);
     setFill(data);
   }
   const handleNumPad = (data) => {
@@ -61,62 +61,83 @@ const HomePage = ({f7router}) => {
     if (fill== 5) {
       setValueX({...valueX, jumlahButir : parseInt(valueNumPad + data)});     
     }
-    if (fill== 6) {
-      setValueX({...valueX, rakSampling : parseInt(valueNumPad + data)});   
-    }
-    if (fill== 7) {
-      setValueX({...valueX, infertile : parseInt(valueNumPad + data)});   
-    }
-    if (fill== 8) {
-      setValueX({...valueX, explode : parseInt(valueNumPad + data)});   
-    }
-    if (fill== 9) {
-      setValueX({...valueX, dis : parseInt(valueNumPad + data)});   
-    }
-    if (fill== 10) {
-      setValueX({...valueX, kurang : parseInt(valueNumPad + data)});   
+    if (fill== 11) {
+      setForm(Form.map((dataForm, index)=>{
+        if (DataParam.no !== index) {
+          return dataForm;
+        }
+        if (DataParam.param===1) {
+          return {
+            ...dataForm,
+            rakBtr : parseInt(valueNumPad + data)
+          }  
+        }
+        if (DataParam.param===2) {
+          return {
+            ...dataForm,
+            rakInf : parseInt(valueNumPad + data)
+          }  
+        }
+        if (DataParam.param===3) {
+          return {
+            ...dataForm,
+            rakExp : parseInt(valueNumPad + data)
+          }  
+        }
+        if (DataParam.param===4) {
+          return {
+            ...dataForm,
+            rakDis : parseInt(valueNumPad + data)
+          }  
+        }
+      })); 
     }
   }
-  const clearCs = () => {
-    const tempdata = valueNumPad;
-    setValueNumPad(Math.floor(tempdata/10));
-    if (fill== 1) {
-      setValueX({...valueX, perKereta : parseInt(Math.floor(tempdata/10))});      
-    }
-    if (fill== 2) {
-      setValueX({...valueX, perRak : parseInt(Math.floor(tempdata/10))});      
-    }
-    if (fill== 3) {
-      setValueX({...valueX, jumlahKereta : parseInt(Math.floor(tempdata/10))});     
-    }
-    if (fill== 4) {
-      setValueX({...valueX, jumlahRak : parseInt(Math.floor(tempdata/10))});     
-    }
-    if (fill== 5) {
-      setValueX({...valueX, jumlahButir : parseInt(Math.floor(tempdata/10))});     
-    }
-    if (fill== 6) {
-      setValueX({...valueX, rakSampling : parseInt(Math.floor(tempdata/10))});   
-    }
-    if (fill== 7) {
-      setValueX({...valueX, infertile : parseInt(Math.floor(tempdata/10))});   
-    }
-    if (fill== 8) {
-      setValueX({...valueX, explode : parseInt(Math.floor(tempdata/10))});   
-    }
-    if (fill== 9) {
-      setValueX({...valueX, dis : parseInt(Math.floor(tempdata/10))});   
-    }
-    if (fill== 10) {
-      setValueX({...valueX, kurang : parseInt(Math.floor(tempdata/10))});   
-    }
+  const [Form, setForm] = useState([]);
+  const [DataParam, setDataParam] = useState({
+    no : 0,
+    param : 0,
+  });
+  const dataperRak = {
+    rakBtr : 0,
+    rakInf : 0,
+    rakExp : 0,
+    rakDis : 0,
+  };
+  const addDataRak = () => {
+    setForm(prex=> [...prex, dataperRak])
+  }
+  const removeRakkk = () => {
+    setForm(prex => prex.splice(0,prex.length-1));
+  }
+  // index-arraynumber, param-manaYangdiisi
+  const eachRak = (index, param) =>{
+    setSheetOpened(true);
+    setValueNumPad(0);
+    setFill(11);
+    setDataParam({no : index, param : param});
   }
   useEffect(()=>{
     setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
-    setJumlahSample(valueX.rakSampling * valueX.perRak);
-    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak));
-    setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
-  },[valueX, setJumlahSample]);
+    setJumlahSample(valueX.rakSampling);
+    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)))/(valueX.perRak*Form.length));
+    setPenggantian((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)))/(valueX.perRak*Form.length)*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
+  },[valueX]);
+  useEffect(()=>{
+    let rakSampel = 0, rakInf =0, rakExp = 0, rakDis = 0, rakKL = 0; 
+    Form.map((data)=>{
+      rakSampel = rakSampel + data.rakBtr;
+      rakInf = rakInf + data.rakInf;
+      rakExp = rakExp + data.rakExp;
+      rakDis = rakDis + data.rakDis;
+    });
+    setValueX({...valueX, 
+      rakSampling : rakSampel,
+      infertile : rakInf,
+      explode : rakExp,
+      dis : rakDis,
+    }); 
+  },[Form]);
   useEffect(()=>{
     Device.getInfo().then((res) => {
       if (res.platform == 'android') {
@@ -136,7 +157,6 @@ const HomePage = ({f7router}) => {
       const aa = document.querySelector('.display');
       const bb = document.querySelector('.contentz');
       bb.style.bottom = 0 + 'px'; 
-      console.log(bb.clientHeight);
       let now = 0;
       let selisih = 0;
       let position = 0;
@@ -178,7 +198,7 @@ const HomePage = ({f7router}) => {
   <Page name="home">
     {/* Top Navbar */}
     <Navbar bgColor='teal' sliding={false}>
-      <NavTitle color='white'>CalPes</NavTitle>
+      <NavTitle color='white'>CalPes1</NavTitle>
       <div className='kananNavbar' onClick={openCalculator}>@cahMagetan {osVs}</div>
     </Navbar>
     <div className='cardCs'>
@@ -187,11 +207,11 @@ const HomePage = ({f7router}) => {
       </Row>
     
       <Row className='rowCs mcs'>
-      <Col className='text-align-center' onClick={()=>{ handleObject(1, valueX.perKereta);}}>
+      <Col className='text-align-center' onClick={()=>{ handleObject(1);}}>
           <div className='fwcs'>Per Kereta :</div>
           <div className='boxCs'> { valueX.perKereta } Rak</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(2, valueX.perRak);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(2);}}>
           <div className='fwcs'>Per Rak :</div>
           <div className='boxCs'> { valueX.perRak } Butir</div>
         </Col>
@@ -199,15 +219,15 @@ const HomePage = ({f7router}) => {
     
     
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(3, valueX.jumlahKereta);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(3);}}>
           <div className='fwcs'>Kereta</div>
           <div className='boxCs'>{ valueX.jumlahKereta }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(4, valueX.jumlahRak);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(4);}}>
           <div className='fwcs'>Rak</div>
           <div className='boxCs'>{ valueX.jumlahRak }</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(5, valueX.jumlahButir);}}>
+        <Col className='text-align-center' onClick={()=>{ handleObject(5);}}>
           <div className='fwcs'>Butir</div>
           <div className='boxCs'>{ valueX.jumlahButir }</div>
         </Col>
@@ -221,42 +241,76 @@ const HomePage = ({f7router}) => {
       <Row bgColor='teal' className='quotacss rowCs'>
         <Col className='text-align-center'>Sampling</Col>
       </Row>
-    
-    
+
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(6, valueX.rakSampling);}}>
-          <div className='fwcs'>Rak</div>
-          <div className='boxCs'>{valueX.rakSampling}</div>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>No.</div>
         </Col>
         <Col className='text-align-center'>
-          <div className='fwcs uncs'>&#x2211; Sample</div>
-          <div>{jumlahSample}</div>
+          <div className='fwcs uncs'>Btr</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Inf</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Exp</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Dis</div>
         </Col>
       </Row>
-    
-    
+      {/* baru */}
+      {Form.map((data, index)=>{
+        return(
+          <Row className='rowCs1 mcs' key={index}>
+            <Col className='text-align-center'>
+              <div>{index + 1}</div>
+            </Col>
+            <Col className='text-align-center' onClick={()=>{ eachRak(index, 1);}}>
+              <div className='boxCs1'>{data.rakBtr}</div>
+            </Col>
+            <Col className='text-align-center' onClick={()=>{ eachRak(index, 2);}}>
+              <div className='boxCs2'>{data.rakInf}</div>
+            </Col>
+            <Col className='text-align-center' onClick={()=>{ eachRak(index, 3);}}>
+              <div className='boxCs2'>{data.rakExp}</div>
+            </Col>
+            <Col className='text-align-center' onClick={()=>{ eachRak(index, 4);}}>
+              <div className='boxCs2'>{data.rakDis}</div>
+            </Col>
+          </Row>  
+        )
+      })}
       <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(7, valueX.infertile);}}>
-          <div className='fwcs'>Infertile</div>
-          <div className='boxCs'>{ valueX.infertile }</div>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Total</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(8, valueX.explode);}}>
-          <div className='fwcs'>Explode</div>
-          <div className='boxCs'>{ valueX.explode }</div>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>{jumlahSample}</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(9, valueX.dis);}}>
-          <div className='fwcs'>DIS</div>
-          <div className='boxCs'>{ valueX.dis }</div>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>{valueX.infertile}</div>
         </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(10, valueX.kurang);}}>
-          <div className='fwcs'>Kurang</div>
-          <div className='boxCs'>{ valueX.kurang }</div>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>{valueX.explode}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>{valueX.dis}</div>
         </Col>
       </Row>
+      <Row className='pd-2'>
+        <Col>
+          <Button bgColor='blue' color='white' onClick={addDataRak}>Tambah Rak</Button>
+        </Col>
+        <Col>
+          <Button bgColor='red' color='white' onClick={removeRakkk}>Hapus Rak</Button>
+        </Col>
+      </Row>
+      {/* jangan dihapus */}
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{valueX.infertile + valueX.explode + valueX.dis + valueX.kurang} ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
+          <div>{valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length))} ( { isNaN(kekurangan) || jumlahSample == 0 || valueX.perRak==0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
@@ -270,10 +324,10 @@ const HomePage = ({f7router}) => {
         </Col>
       </Row>
     </div>
-    
     <div className='moreCs'>
-      <Button onClick={() => f7router.navigate('/adv/')} bgColor='orange' color='white'>Tambahan</Button>
+      <Button onClick={() => f7router.back()} bgColor='orange' color='white'>Kembali</Button>
     </div>
+    
     <Sheet
       className="demo-sheet"
       opened={sheetOpened}
@@ -306,7 +360,6 @@ const HomePage = ({f7router}) => {
             <Col className='text-align-center' onClick={()=>{ handleNumPad('9')}}><Button className='pyNumPad' fill bgColor='teal'>9</Button></Col>
           </Row>
           <Row className='btnNum'>
-            <Col className='text-align-center' onClick={clearCs}><Button className='pyNumPad' fill bgColor='teal'><Icon material="backspace"></Icon></Button></Col>
             <Col className='text-align-center' onClick={()=>{ handleNumPad('0')}}><Button className='pyNumPad' fill bgColor='teal'>0</Button></Col>
             <Col className='text-align-center' onClick={()=>{ setSheetOpened(false)} } ><Button className='pyNumPad' fill bgColor='teal'><Icon material="check"></Icon></Button></Col>
           </Row> 
@@ -315,4 +368,4 @@ const HomePage = ({f7router}) => {
     <CalculatorsW calculator={calculator} closeCalculation={closeCalculation} />
   </Page>
 )};
-export default HomePage;
+export default Adv;
