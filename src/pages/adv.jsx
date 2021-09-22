@@ -298,7 +298,7 @@ const Adv = ({f7router}) => {
           <div className='fwcs uncs'>{valueX.dis}</div>
         </Col>
       </Row>
-      <Row className='pd-2'>
+      <Row className='pd-2 mb-2'>
         <Col>
           <Button bgColor='blue' color='white' onClick={addDataRak}>Tambah Rak</Button>
         </Col>
