@@ -12,10 +12,16 @@ import {
   Col,
   Button,
   Icon,
+  LoginScreen,
+  LoginScreenTitle,
+  List,
+  ListInput
 } from 'framework7-react';
 import CalculatorsW from '../components/calculator';
+import { pdf1 } from '../pdf';
 
 const HomePage = ({f7router}) => {
+  const [loginScreenOpened, setloginScreenOpened] = useState(false);
   const [sheetOpened, setSheetOpened] = useState(false);
   const [fill, setFill] = useState(0);
   const [valueNumPad, setValueNumPad] = useState(0);
@@ -30,6 +36,7 @@ const HomePage = ({f7router}) => {
     explode : 0,
     dis : 0,
     kurang : 0,
+    lebih : 0
   });
   const [osVs, setOsVs] = useState(1);
   const [quota, setQuota] = useState(0);
@@ -41,6 +48,7 @@ const HomePage = ({f7router}) => {
     setValueNumPad(value);
     setFill(data);
   }
+  const [JudulPdf, setJudulPdf] = useState('');
   const handleNumPad = (data) => {
     if (parseInt(valueNumPad + data) > 10000) {
       return;
@@ -76,6 +84,9 @@ const HomePage = ({f7router}) => {
     if (fill== 10) {
       setValueX({...valueX, kurang : parseInt(valueNumPad + data)});   
     }
+    if (fill== 11) {
+      setValueX({...valueX, lebih : parseInt(valueNumPad + data)});   
+    }
   }
   const clearCs = () => {
     const tempdata = valueNumPad;
@@ -110,12 +121,15 @@ const HomePage = ({f7router}) => {
     if (fill== 10) {
       setValueX({...valueX, kurang : parseInt(Math.floor(tempdata/10))});   
     }
+    if (fill== 11) {
+      setValueX({...valueX, lebih : parseInt(Math.floor(tempdata/10))});   
+    }
   }
   useEffect(()=>{
     setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
     setJumlahSample(valueX.rakSampling * valueX.perRak);
-    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak));
-    setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
+    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak));
+    setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
   },[valueX, setJumlahSample]);
   useEffect(()=>{
     Device.getInfo().then((res) => {
@@ -167,8 +181,20 @@ const HomePage = ({f7router}) => {
           setSheetOpened(false);
         } else if (calculator) {
           setCalculator(false);
+        } else if (loginScreenOpened) {
+          setloginScreenOpened(false);
         } else {
           App.exitApp()
+        }
+      } else {
+        if (sheetOpened) {
+          setSheetOpened(false);
+        } else if (calculator) {
+          setCalculator(false);
+        } else if (loginScreenOpened) {
+          setloginScreenOpened(false);
+        } else {
+          f7router.back()
         }
       }
     })
@@ -235,7 +261,7 @@ const HomePage = ({f7router}) => {
       </Row>
     
     
-      <Row className='rowCs mcs'>
+      <Row className='rowCs mcs btcs'>
         <Col className='text-align-center' onClick={()=>{ handleObject(7, valueX.infertile);}}>
           <div className='fwcs'>Infertile</div>
           <div className='boxCs'>{ valueX.infertile }</div>
@@ -248,31 +274,41 @@ const HomePage = ({f7router}) => {
           <div className='fwcs'>DIS</div>
           <div className='boxCs'>{ valueX.dis }</div>
         </Col>
+      </Row>
+      <Row className='rowCs mcs'>
         <Col className='text-align-center' onClick={()=>{ handleObject(10, valueX.kurang);}}>
           <div className='fwcs'>Kurang</div>
           <div className='boxCs'>{ valueX.kurang }</div>
+        </Col>
+        <Col className='text-align-center' onClick={()=>{ handleObject(11, valueX.lebih);}}>
+          <div className='fwcs'>Lebih</div>
+          <div className='boxCs'>{ valueX.lebih }</div>
         </Col>
       </Row>
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{valueX.infertile + valueX.explode + valueX.dis + valueX.kurang} ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
+          <div>{ valueX.infertile + valueX.explode + valueX.dis + valueX.kurang-valueX.lebih} ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
-        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
+        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample==0 ? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
       </Row>
       <Row className='rowCs mcs'>
         <Col className='text-align-center'>
-          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || jumlahSample == 0? '0' : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
+          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? (valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
         </Col>
       </Row>
     </div>
+
+    <div className='moreCs'>
+      <Button onClick={() => setloginScreenOpened(true)} bgColor='blue' color='white'>Buat PDF</Button>
+    </div>
     
     <div className='moreCs'>
-      <Button onClick={() => f7router.navigate('/adv/')} bgColor='orange' color='white'>Tambahan</Button>
+      <Button onClick={() => f7router.navigate('/adv/')} bgColor='orange' color='white'>CalPes1</Button>
     </div>
     <Sheet
       className="demo-sheet"
@@ -313,6 +349,26 @@ const HomePage = ({f7router}) => {
       </PageContent>
     </Sheet>
     <CalculatorsW calculator={calculator} closeCalculation={closeCalculation} />
+    <LoginScreen
+      className="demo-login-screen"
+      opened={loginScreenOpened}
+    >
+      <Page loginScreen>
+        <LoginScreenTitle>Buat PDF</LoginScreenTitle>
+        <div className='moreCs'>
+        <List noHairlinesMd>
+          <ListInput
+            onChange={e=> setJudulPdf(e.target.value)}
+            type="text"
+            placeholder="Perusahaan ex: 'PT. CahMagetan'"
+            clearButton
+          />
+        </List>
+        <Button onClick={() => {pdf1(JudulPdf, valueX, quota, jumlahSample, penggantian); setloginScreenOpened(false);}} bgColor='blue' color='white'>Simpan Pdf</Button>
+        <div className='undclose' onClick={() => { setloginScreenOpened(false);}}>Close</div>
+        </div>
+      </Page>
+    </LoginScreen>
   </Page>
 )};
 export default HomePage;

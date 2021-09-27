@@ -12,8 +12,13 @@ import {
   Col,
   Button,
   Icon,
+  LoginScreen,
+  LoginScreenTitle,
+  List,
+  ListInput
 } from 'framework7-react';
 import CalculatorsW from '../components/calculator';
+import { pdf } from '../pdf';
 
 const Adv = ({f7router}) => {
   const [sheetOpened, setSheetOpened] = useState(false);
@@ -117,6 +122,8 @@ const Adv = ({f7router}) => {
     setFill(11);
     setDataParam({no : index, param : param});
   }
+  const [loginScreenOpened, setloginScreenOpened] = useState(false);
+  const [JudulPdf, setJudulPdf] = useState('');
   useEffect(()=>{
     setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
     setJumlahSample(valueX.rakSampling);
@@ -187,8 +194,20 @@ const Adv = ({f7router}) => {
           setSheetOpened(false);
         } else if (calculator) {
           setCalculator(false);
+        } else if (loginScreenOpened) {
+          setloginScreenOpened(false);
         } else {
           App.exitApp()
+        }
+      } else {
+        if (sheetOpened) {
+          setSheetOpened(false);
+        } else if (calculator) {
+          setCalculator(false);
+        } else if (loginScreenOpened) {
+          setloginScreenOpened(false);
+        } else {
+          f7router.back()
         }
       }
     })
@@ -243,6 +262,16 @@ const Adv = ({f7router}) => {
       </Row>
 
       <Row className='rowCs mcs'>
+        <Col className='text-align-center'>
+          <div className='fwcs'>Rak</div>
+          <div>{Form.length}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>&#x2211; Sample</div>
+          <div>{Form.length * valueX.perRak}</div>
+        </Col>
+      </Row>
+      <Row className='rowCs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>No.</div>
         </Col>
@@ -306,28 +335,101 @@ const Adv = ({f7router}) => {
           <Button bgColor='red' color='white' onClick={removeRakkk}>Hapus Rak</Button>
         </Col>
       </Row>
+      <Row className='rowCs1 mcs btcs'>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Summary Sampling</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Parameter</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Jumlah</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div className='fwcs uncs'>Persentase</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div>Kurang</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.rakSampling-(valueX.perRak*Form.length) < 0 ? (valueX.perRak*Form.length) - valueX.rakSampling : 0}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.rakSampling-(valueX.perRak*Form.length) < 0 && valueX.perRak*Form.length !== 0? (((valueX.perRak*Form.length) - valueX.rakSampling)/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div>Lebih</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.rakSampling-(valueX.perRak*Form.length) > 0 ? valueX.rakSampling-(valueX.perRak*Form.length) : 0}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.rakSampling-(valueX.perRak*Form.length) > 0 && valueX.perRak*Form.length !== 0? ((valueX.rakSampling-(valueX.perRak*Form.length))/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div>Infetile</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.infertile}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{ valueX.perRak*Form.length > 0 ? (valueX.infertile/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div>Explode</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.explode}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.perRak*Form.length > 0 ? (valueX.explode/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+        </Col>
+      </Row>
+      <Row className='rowCs2 mcs'>
+        <Col className='text-align-center'>
+          <div>DIS</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.dis}</div>
+        </Col>
+        <Col className='text-align-center'>
+          <div>{valueX.perRak*Form.length >0 ? (valueX.dis/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+        </Col>
+      </Row>
       {/* jangan dihapus */}
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length))} ( { isNaN(kekurangan) || jumlahSample == 0 || valueX.perRak==0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
+          <div>{ valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length))} ( { isNaN(kekurangan) || jumlahSample == 0 || valueX.perRak==0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
-        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
+        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || penggantian< 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || penggantian < 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
       </Row>
       <Row className='rowCs mcs'>
         <Col className='text-align-center'>
-          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || jumlahSample == 0? '0' : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
+          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0 ? ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
         </Col>
       </Row>
     </div>
     <div className='moreCs'>
-      <Button onClick={() => f7router.back()} bgColor='orange' color='white'>Kembali</Button>
+      <Button onClick={() => setloginScreenOpened(true)} bgColor='blue' color='white'>Buat Pdf</Button>
     </div>
-    
+    <div className='moreCs'>
+      <Button onClick={() => f7router.back()} bgColor='orange' color='white'>Kembali CalPes</Button>
+    </div>
     <Sheet
       className="demo-sheet"
       opened={sheetOpened}
@@ -366,6 +468,26 @@ const Adv = ({f7router}) => {
       </PageContent>
     </Sheet>
     <CalculatorsW calculator={calculator} closeCalculation={closeCalculation} />
+    <LoginScreen
+      className="demo-login-screen"
+      opened={loginScreenOpened}
+    >
+      <Page loginScreen>
+        <LoginScreenTitle>Buat PDF</LoginScreenTitle>
+        <div className='moreCs'>
+        <List noHairlinesMd>
+          <ListInput
+            onChange={e=> setJudulPdf(e.target.value)}
+            type="text"
+            placeholder="Perusahaan ex: 'PT. CahMagetan'"
+            clearButton
+          />
+        </List>
+        <Button onClick={() => {pdf(JudulPdf, valueX, quota, Form, jumlahSample, penggantian); setloginScreenOpened(false);}} bgColor='blue' color='white'>Simpan Pdf</Button>
+        <div className='undclose' onClick={() => { setloginScreenOpened(false);}}>Close</div>
+        </div>
+      </Page>
+    </LoginScreen>
   </Page>
 )};
 export default Adv;
