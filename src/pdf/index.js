@@ -129,6 +129,12 @@ summary.push(
     { text: 'Total', bold: true, alignment: 'center' }, 
     { text: totalInf+totalExp+totalDis-totalKL, bold: true, alignment: 'center' }, 
     { text: valueX.perRak*Form.length >0 ? ((totalInf+totalExp+totalDis-totalKL)/(valueX.perRak*Form.length)*100).toFixed(2) + ' %' : (0).toFixed(2) + ' %', bold: true, alignment: 'center' }
+  ],
+  [
+    { text: '*', bold: true, alignment: 'center', color : '#A70000' }, 
+    { text: 'Penggantian', bold: true, alignment: 'center', color : '#A70000' }, 
+    { text: totalKL < 0 ? totalInf+totalExp+totalDis-totalKL : totalInf+totalExp+totalDis, bold: true, alignment: 'center', color : '#A70000' }, 
+    { text: valueX.perRak*Form.length > 0 ? totalKL < 0 ? ((totalInf+totalExp+totalDis-totalKL)/(valueX.perRak*Form.length)*100).toFixed(2) + ' %' : ((totalInf+totalExp+totalDis)/(valueX.perRak*Form.length)*100).toFixed(2) + ' %' : (0).toFixed(2) + ' %', bold: true, alignment: 'center', color : '#A70000' }
   ])
 var tabelsummary =
     {
@@ -234,6 +240,9 @@ var dd = {
 	    tabel,
 	    { text: 'Summary Sampling', fontSize: 14, bold: true, decoration:'underline', alignment: 'center', margin: [0,20,0,10] },
 	    tabelsummary,
+      { text: 'Note :' , fontSize: 12, margin: [0,0,0,0] },
+      { text: '- Jumlah sample lebih tidak dihitung.' , fontSize: 12, margin: [0,0,0,0] },
+      { text: '- Jumlah sample kurang tetap dihitung.' , fontSize: 12, margin: [0,0,0,0] },
 	    { text: `Penggantian : ${isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( ${valueX.perRak == 0 || penggantian< 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, ${ valueX.perRak == 0 || penggantian < 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )`, fontSize: 14, bold: true, decoration:'underline', alignment: 'left', margin: [0,20,0,10] },
 	    { text: `Qouta tidak diganti : ${isNaN(penggantian) || penggantian < 0 || jumlahSample == 0 ? ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr`, fontSize: 14, bold: true, decoration:'underline', alignment: 'left', margin: [0,0,0,10] },
 	]
@@ -255,7 +264,7 @@ var dd = {
       filename: `Pemusnahan-${date.toLocaleDateString('id-ID').split('/').join('-')}-${date.getTime()}.pdf`,
       base64Data: data,
       contentType: "application/pdf",
-  })
+    });
   });
 }
 
@@ -309,6 +318,12 @@ summary.push(
     { text: 'Total', bold: true, alignment: 'center' }, 
     { text: totalInf+totalExp+totalDis+totalKur-totalLeb, bold: true, alignment: 'center' }, 
     { text: jumlahSample > 0 ? ((totalInf+totalExp+totalDis+totalKur-totalLeb)/jumlahSample*100).toFixed(2) + ' %' : (0).toFixed(2) + ' %', bold: true, alignment: 'center' }
+  ],
+  [
+    { text: '*', bold: true, alignment: 'center', color: '#A70000' }, 
+    { text: 'Penggantian', bold: true, alignment: 'center', color: '#A70000' }, 
+    { text: totalKur-totalLeb > 0 ? totalInf+totalExp+totalDis+totalKur-totalLeb : totalInf+totalExp+totalDis, bold: true, alignment: 'center', color: '#A70000' }, 
+    { text: jumlahSample > 0 ? totalKur-totalLeb > 0 ? ((totalInf+totalExp+totalDis+totalKur-totalLeb)/jumlahSample*100).toFixed(2) + ' %' : ((totalInf+totalExp+totalDis)/jumlahSample*100).toFixed(2) + ' %' : (0).toFixed(2) + ' %', bold: true, alignment: 'center', color: '#A70000' }
   ])
 var tabelsummary =
     {
@@ -413,9 +428,12 @@ var dd = {
 	    },
 	    { text: 'Sampling', fontSize: 14, bold: true, decoration:'underline', alignment: 'center', margin: [0,20,0,10] },
 	    tabelsummary,
+      { text: 'Note :' , fontSize: 12, margin: [0,0,0,0] },
+      { text: '- Jumlah sample lebih tidak dihitung.' , fontSize: 12, margin: [0,0,0,0] },
+      { text: '- Jumlah sample kurang tetap dihitung.' , fontSize: 12, margin: [0,0,0,0] },
 	    { text: `Penggantian : ${isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( ${valueX.perRak == 0 || penggantian< 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, ${ valueX.perRak == 0 || penggantian < 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )`, fontSize: 14, bold: true, decoration:'underline', alignment: 'left', margin: [0,20,0,10] },
 	    { text: `Qouta tidak diganti : ${isNaN(penggantian) || penggantian < 0 || jumlahSample == 0 ? ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr`, fontSize: 14, bold: true, decoration:'underline', alignment: 'left', margin: [0,0,0,10] },
-      { text: `Powered By : @cahMagetan`, fontSize: 8, decoration: 'underline', italics: true, bold: true, alignment: 'center', margin: [0,320,0,0] },
+      { text: `Powered By : @cahMagetan`, fontSize: 8, decoration: 'underline', italics: true, bold: true, alignment: 'center', margin: [0,250,0,0] },
 	]
 }
   // pdfMake.createPdf(dd).download();
@@ -435,7 +453,7 @@ var dd = {
       filename: `Pemusnahan-${date.toLocaleDateString('id-ID').split('/').join('-')}-${date.getTime()}.pdf`,
       base64Data: data,
       contentType: "application/pdf",
-  })
+    });
   });
 }
 

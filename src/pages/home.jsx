@@ -128,8 +128,8 @@ const HomePage = ({f7router}) => {
   useEffect(()=>{
     setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
     setJumlahSample(valueX.rakSampling * valueX.perRak);
-    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak));
-    setPenggantian(((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
+    setKekurangan(valueX.kurang-valueX.lebih > 0 ? (valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak) : (valueX.infertile+valueX.explode+valueX.dis)/(valueX.rakSampling * valueX.perRak));
+    setPenggantian(valueX.kurang-valueX.lebih > 0 ? ((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-valueX.lebih)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : ((valueX.infertile+valueX.explode+valueX.dis)/(valueX.rakSampling * valueX.perRak))*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
   },[valueX, setJumlahSample]);
   useEffect(()=>{
     Device.getInfo().then((res) => {
@@ -288,16 +288,17 @@ const HomePage = ({f7router}) => {
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{ valueX.infertile + valueX.explode + valueX.dis + valueX.kurang-valueX.lebih} ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
+          <div>{ valueX.infertile + valueX.explode + valueX.dis + valueX.kurang-valueX.lebih } ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : ((valueX.infertile + valueX.explode + valueX.dis + valueX.kurang-valueX.lebih)/jumlahSample*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
-        <Col className='text-align-center'>Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample==0 ? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</Col>
+        <Col className='text-align-center'>Penggantian : { valueX.kurang-valueX.lebih > 0 ? valueX.infertile + valueX.explode + valueX.dis + valueX.kurang-valueX.lebih : valueX.infertile + valueX.explode + valueX.dis } ( { isNaN(kekurangan) || jumlahSample == 0 ? '0' : (kekurangan*100).toFixed(2) } %)</Col>
       </Row>
       <Row className='rowCs mcs'>
         <Col className='text-align-center'>
+          <div className='fwcs'>&#x2211; Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || isNaN(penggantian) || penggantian < 0 || jumlahSample==0 ? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</div>
           <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? (valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
         </Col>
       </Row>
