@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { App } from '@capacitor/app';
 import { Device } from '@capacitor/device';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -20,26 +20,21 @@ import {
   Link
 } from 'framework7-react';
 import CalculatorsW from '../components/calculator';
-import { pdf } from '../pdf';
+import { pdf2 } from '../pdf';
 
-const Adv = ({f7router}) => {
+const Adv1 = ({f7router}) => {
   const [sheetOpened, setSheetOpened] = useState(false);
   const [fill, setFill] = useState(0);
   const [valueNumPad, setValueNumPad] = useState(0);
   const [valueX, setValueX] = useState({
-    perKereta : 0,
-    perRak : 0,
-    jumlahKereta : 0,
-    jumlahRak : 0,
-    jumlahButir : 0,
     rakSampling : 0,
     infertile : 0,
     explode : 0,
     dis : 0,
-    kurang : 0,
   });
   const [osVs, setOsVs] = useState(1);
   const [quota, setQuota] = useState(0);
+  const [rata2, setRata2] = useState(0);
   const [jumlahSample, setJumlahSample] = useState(0);
   const [kekurangan, setKekurangan] = useState(0);
   const [penggantian, setPenggantian] = useState(0);
@@ -49,24 +44,15 @@ const Adv = ({f7router}) => {
     setFill(data);
   }
   const handleNumPad = (data) => {
-    if (parseInt(valueNumPad + data) > 10000) {
+    if (parseInt(valueNumPad + data) > 1000000) {
       return;
     }
     setValueNumPad(parseInt(valueNumPad + data));
     if (fill== 1) {
-      setValueX({...valueX, perKereta : parseInt(valueNumPad + data)});      
+      setQuota(parseInt(valueNumPad + data));  
     }
     if (fill== 2) {
-      setValueX({...valueX, perRak : parseInt(valueNumPad + data)});      
-    }
-    if (fill== 3) {
-      setValueX({...valueX, jumlahKereta : parseInt(valueNumPad + data)});     
-    }
-    if (fill== 4) {
-      setValueX({...valueX, jumlahRak : parseInt(valueNumPad + data)});     
-    }
-    if (fill== 5) {
-      setValueX({...valueX, jumlahButir : parseInt(valueNumPad + data)});     
+      setRata2(parseInt(valueNumPad + data));      
     }
     if (fill== 11) {
       setForm(Form.map((dataForm, index)=>{
@@ -127,13 +113,12 @@ const Adv = ({f7router}) => {
   const [loginScreenOpened, setloginScreenOpened] = useState(false);
   const [JudulPdf, setJudulPdf] = useState('');
   useEffect(()=>{
-    setQuota((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir);
     setJumlahSample(valueX.rakSampling);
-    setKekurangan((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)))/(valueX.perRak*Form.length));
-    setPenggantian((valueX.rakSampling-(valueX.perRak*Form.length)) > 0 ?
-    (valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.perRak*Form.length)*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : 
-    (valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)))/(valueX.perRak*Form.length)*((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir));
-  },[valueX]);
+    setKekurangan((valueX.infertile+valueX.explode+valueX.dis-(valueX.rakSampling-(rata2*Form.length)))/(rata2*Form.length));
+    setPenggantian((valueX.rakSampling-(rata2*Form.length)) > 0 ?
+    (valueX.infertile+valueX.explode+valueX.dis)/(rata2*Form.length)*(quota) : 
+    (valueX.infertile+valueX.explode+valueX.dis-(valueX.rakSampling-(rata2*Form.length)))/(rata2*Form.length)*(quota));
+  },[valueX, quota]);
   useEffect(()=>{
     let rakSampel = 0, rakInf =0, rakExp = 0, rakDis = 0, rakKL = 0; 
     Form.map((data)=>{
@@ -218,7 +203,7 @@ const Adv = ({f7router}) => {
   },[sheetOpened, calculator]);
 
   return (
-  <Page name="adv">
+  <Page name="adv1">
     {/* Top Navbar */}
     <Navbar bgColor='teal' sliding={false}>
       <NavLeft>
@@ -226,7 +211,7 @@ const Adv = ({f7router}) => {
           <Icon f7="icon-bars" color="white"></Icon>
         </Link>
       </NavLeft>
-      <NavTitle color='white'>CalPes 2</NavTitle>
+      <NavTitle color='white'>CalPes 3</NavTitle>
       <div className='kananNavbar' onClick={openCalculator}>@cahMagetan {osVs}</div>
     </Navbar>
     <div className='cardCs'>
@@ -235,33 +220,13 @@ const Adv = ({f7router}) => {
       </Row>
     
       <Row className='rowCs mcs'>
-      <Col className='text-align-center' onClick={()=>{ handleObject(1);}}>
-          <div className='fwcs'>Per Kereta :</div>
-          <div className='boxCs'> { valueX.perKereta } Rak</div>
+        <Col className='text-align-center' onClick={()=>{ handleObject(1);}}>
+          <div className='fwcs'>Quota :</div>
+          <div className='boxCs'> { quota } Butir</div>
         </Col>
         <Col className='text-align-center' onClick={()=>{ handleObject(2);}}>
-          <div className='fwcs'>Per Rak :</div>
-          <div className='boxCs'> { valueX.perRak } Butir</div>
-        </Col>
-      </Row>
-    
-    
-      <Row className='rowCs mcs'>
-        <Col className='text-align-center' onClick={()=>{ handleObject(3);}}>
-          <div className='fwcs'>Kereta</div>
-          <div className='boxCs'>{ valueX.jumlahKereta }</div>
-        </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(4);}}>
-          <div className='fwcs'>Rak</div>
-          <div className='boxCs'>{ valueX.jumlahRak }</div>
-        </Col>
-        <Col className='text-align-center' onClick={()=>{ handleObject(5);}}>
-          <div className='fwcs'>Butir</div>
-          <div className='boxCs'>{ valueX.jumlahButir }</div>
-        </Col>
-        <Col className='text-align-center'>
-          <div className='fwcs uncs'>Jumlah</div>
-          <div>{ quota }</div>
+          <div className='fwcs'>Rata2 per rak :</div>
+          <div className='boxCs'> { rata2 } Butir</div>
         </Col>
       </Row>
     </div>
@@ -277,7 +242,7 @@ const Adv = ({f7router}) => {
         </Col>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>&#x2211; Sample</div>
-          <div>{Form.length * valueX.perRak}</div>
+          <div>{Form.length * rata2}</div>
         </Col>
       </Row>
       <Row className='rowCs btcs'>
@@ -365,10 +330,10 @@ const Adv = ({f7router}) => {
           <div>Kurang</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.rakSampling-(valueX.perRak*Form.length) < 0 ? (valueX.perRak*Form.length) - valueX.rakSampling : 0}</div>
+          <div>{valueX.rakSampling-(rata2*Form.length) < 0 ? (rata2*Form.length) - valueX.rakSampling : 0}</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.rakSampling-(valueX.perRak*Form.length) < 0 && valueX.perRak*Form.length !== 0? (((valueX.perRak*Form.length) - valueX.rakSampling)/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+          <div>{valueX.rakSampling-(rata2*Form.length) < 0 && rata2*Form.length !== 0? (((rata2*Form.length) - valueX.rakSampling)/(rata2*Form.length)*100).toFixed(2) : 0} %</div>
         </Col>
       </Row>
       <Row className='rowCs2 mcs'>
@@ -376,10 +341,10 @@ const Adv = ({f7router}) => {
           <div>Lebih</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.rakSampling-(valueX.perRak*Form.length) > 0 ? valueX.rakSampling-(valueX.perRak*Form.length) : 0}</div>
+          <div>{valueX.rakSampling-(rata2*Form.length) > 0 ? valueX.rakSampling-(rata2*Form.length) : 0}</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.rakSampling-(valueX.perRak*Form.length) > 0 && valueX.perRak*Form.length !== 0? ((valueX.rakSampling-(valueX.perRak*Form.length))/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+          <div>{valueX.rakSampling-(rata2*Form.length) > 0 && rata2*Form.length !== 0? ((valueX.rakSampling-(rata2*Form.length))/(rata2*Form.length)*100).toFixed(2) : 0} %</div>
         </Col>
       </Row>
       <Row className='rowCs2 mcs'>
@@ -390,7 +355,7 @@ const Adv = ({f7router}) => {
           <div>{valueX.infertile}</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{ valueX.perRak*Form.length > 0 ? (valueX.infertile/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+          <div>{ rata2*Form.length > 0 ? (valueX.infertile/(rata2*Form.length)*100).toFixed(2) : 0} %</div>
         </Col>
       </Row>
       <Row className='rowCs2 mcs'>
@@ -401,7 +366,7 @@ const Adv = ({f7router}) => {
           <div>{valueX.explode}</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.perRak*Form.length > 0 ? (valueX.explode/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+          <div>{rata2*Form.length > 0 ? (valueX.explode/(rata2*Form.length)*100).toFixed(2) : 0} %</div>
         </Col>
       </Row>
       <Row className='rowCs2 mcs'>
@@ -412,25 +377,25 @@ const Adv = ({f7router}) => {
           <div>{valueX.dis}</div>
         </Col>
         <Col className='text-align-center'>
-          <div>{valueX.perRak*Form.length >0 ? (valueX.dis/(valueX.perRak*Form.length)*100).toFixed(2) : 0} %</div>
+          <div>{rata2*Form.length >0 ? (valueX.dis/(rata2*Form.length)*100).toFixed(2) : 0} %</div>
         </Col>
       </Row>
       {/* jangan dihapus */}
       <Row className='rowCs mcs btcs'>
         <Col className='text-align-center'>
           <div className='fwcs uncs'>Total</div>
-          <div>{ valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length))} ( { isNaN(kekurangan) || jumlahSample == 0 || valueX.perRak==0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
+          <div>{ valueX.infertile+valueX.explode+valueX.dis-(valueX.rakSampling-(rata2*Form.length))} ( { isNaN(kekurangan) || jumlahSample == 0 || rata2==0 ? '0' : (kekurangan*100).toFixed(2) } %)</div>
         </Col>
       </Row>
     </div>
     <div className='cardCs'>
       <Row bgColor='teal' className='quotacss rowCs'>
-        <Col className='text-align-center'>Penggantian : { (valueX.rakSampling-(valueX.perRak*Form.length)) > 0 ? valueX.infertile+valueX.explode+valueX.dis+valueX.kurang : valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)) } ( { isNaN(kekurangan) || jumlahSample == 0 || valueX.perRak==0 ? '0' : (valueX.rakSampling-(valueX.perRak*Form.length)) > 0 ? (((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang)/(valueX.perRak*Form.length))*100).toFixed(2) : (((valueX.infertile+valueX.explode+valueX.dis+valueX.kurang-(valueX.rakSampling-(valueX.perRak*Form.length)))/(valueX.perRak*Form.length))*100).toFixed(2)} %)</Col>
+        <Col className='text-align-center'>Penggantian : { (valueX.rakSampling-(rata2*Form.length)) > 0 ? valueX.infertile+valueX.explode+valueX.dis : valueX.infertile+valueX.explode+valueX.dis-(valueX.rakSampling-(rata2*Form.length)) } ( { isNaN(kekurangan) || jumlahSample == 0 || rata2==0 ? '0' : (valueX.rakSampling-(rata2*Form.length)) > 0 ? (((valueX.infertile+valueX.explode+valueX.dis)/(rata2*Form.length))*100).toFixed(2) : (((valueX.infertile+valueX.explode+valueX.dis-(valueX.rakSampling-(rata2*Form.length)))/(rata2*Form.length))*100).toFixed(2)} %)</Col>
       </Row>
       <Row className='rowCs mcs'>
         <Col className='text-align-center'>
-          <div className='fwcs'>&#x2211; Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { valueX.perRak == 0 || penggantian< 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/valueX.perRak)} rak, { valueX.perRak == 0 || penggantian < 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/valueX.perRak)*valueX.perRak) } btr )</div>
-          <div className='fwcs'>Quota (tidak mengganti) : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0 ? ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) : ((valueX.jumlahKereta*valueX.perKereta*valueX.perRak)+(valueX.jumlahRak*valueX.perRak)+valueX.jumlahButir) - Math.round(penggantian)} Btr</div>
+          <div className='fwcs'>&#x2211; Penggantian : {isNaN(penggantian) || penggantian < 0 || jumlahSample == 0? '0' : Math.round(penggantian)} Btr ( { rata2 == 0 || penggantian< 0 || isNaN(penggantian) || jumlahSample ==0 ? '0' : Math.floor(Math.round(penggantian)/rata2)} rak, { rata2 == 0 || penggantian < 0 || isNaN(penggantian) || jumlahSample==0? '0' : Math.round(penggantian) - (Math.floor(Math.round(penggantian)/rata2)*rata2) } btr )</div>
+          <div className='fwcs'>Quota (tidak mengganti) : { isNaN(penggantian) || penggantian < 0 || jumlahSample == 0 ? (quota) : quota - Math.round(penggantian)} Btr</div>
         </Col>
       </Row>
     </div>
@@ -490,11 +455,11 @@ const Adv = ({f7router}) => {
             clearButton
           />
         </List>
-        <Button onClick={() => {pdf(JudulPdf, valueX, quota, Form, jumlahSample, penggantian); setloginScreenOpened(false);}} bgColor='blue' color='white'>Simpan Pdf</Button>
+        <Button onClick={() => {pdf2(JudulPdf, valueX, quota, Form, jumlahSample, penggantian, rata2); setloginScreenOpened(false);}} bgColor='blue' color='white'>Simpan Pdf</Button>
         <div className='undclose' onClick={() => { setloginScreenOpened(false);}}>Close</div>
         </div>
       </Page>
     </LoginScreen>
   </Page>
 )};
-export default Adv;
+export default Adv1;

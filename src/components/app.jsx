@@ -11,6 +11,7 @@ import capacitorApp from '../js/capacitor-app';
 import routes from '../js/routes';
 import store from '../js/store';
 import '../css/css.css'
+import Panelx from './panelx';
 
 const MyApp = () => {
   // Login screen demo data
@@ -49,7 +50,8 @@ const MyApp = () => {
 
   return (
     <App { ...f7params } >
-        <View main className="safe-areas" url="/" />
+      <Panelx />
+      <View main className="safe-areas" url="/" />
     </App>
   )
 }

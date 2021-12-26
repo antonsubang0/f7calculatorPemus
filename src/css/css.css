@@ -8,10 +8,31 @@
 .navbar-bg {
     background-color: var(--f7-theme-color-bg-color);
 }
+div.title.color-white.titlepanel {
+    margin-left: 15px;
+}
 div.title.color-white {
     color: var(--swiper-theme-color);
     font-weight: 700;
     font-size: 1.2rem;
+    margin-left: 5px;
+}
+.panellist{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.bg-slidemenu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #009688;
+    height: calc(100% - 144px);
+}
+img.logoSlideMenu {
+    width: 50%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px #000;
 }
 div {
     font-size: 0.9rem;

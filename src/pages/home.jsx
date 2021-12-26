@@ -5,6 +5,8 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   Page,
   Navbar,
+  NavLeft,
+  Link,
   NavTitle,
   PageContent,
   Sheet, Toolbar,
@@ -15,7 +17,7 @@ import {
   LoginScreen,
   LoginScreenTitle,
   List,
-  ListInput
+  ListInput,
 } from 'framework7-react';
 import CalculatorsW from '../components/calculator';
 import { pdf1 } from '../pdf';
@@ -184,7 +186,7 @@ const HomePage = ({f7router}) => {
         } else if (loginScreenOpened) {
           setloginScreenOpened(false);
         } else {
-          App.exitApp()
+          App.exitApp();
         }
       } else {
         if (sheetOpened) {
@@ -194,7 +196,7 @@ const HomePage = ({f7router}) => {
         } else if (loginScreenOpened) {
           setloginScreenOpened(false);
         } else {
-          f7router.back()
+          App.exitApp();
         }
       }
     })
@@ -204,7 +206,12 @@ const HomePage = ({f7router}) => {
   <Page name="home">
     {/* Top Navbar */}
     <Navbar bgColor='teal' sliding={false}>
-      <NavTitle color='white'>CalPes</NavTitle>
+      <NavLeft>
+        <Link panelOpen="left">
+          <Icon f7="icon-bars" color="white"></Icon>
+        </Link>
+      </NavLeft>
+      <NavTitle color='white'>CalPes 1</NavTitle>
       <div className='kananNavbar' onClick={openCalculator}>@cahMagetan {osVs}</div>
     </Navbar>
     <div className='cardCs'>
@@ -306,10 +313,6 @@ const HomePage = ({f7router}) => {
 
     <div className='moreCs'>
       <Button onClick={() => setloginScreenOpened(true)} bgColor='blue' color='white'>Buat PDF</Button>
-    </div>
-    
-    <div className='moreCs'>
-      <Button onClick={() => f7router.navigate('/adv/')} bgColor='orange' color='white'>CalPes1</Button>
     </div>
     <Sheet
       className="demo-sheet"
